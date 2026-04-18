@@ -28,4 +28,4 @@ def calculate_food_security(diameter, days_post_impact):
     return {
         "supply": round(current_supply, 3),
         "beta": round(beta_t * 100, 1),
-        "loss_pct": round((1 - (current_supply/S0)) * 100, 1)
+        "loss_pct": round((1 - (current_supply/S0)) * 100, 1)}
