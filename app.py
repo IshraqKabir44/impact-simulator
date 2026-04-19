@@ -24,7 +24,7 @@ with st.sidebar:
     st.header("Simulation Settings")
     st.markdown("Adjust the initial impactor variables:")
     dia = st.slider("Asteroid Diameter (m)", 500, 5000, 1000)
-    t_days = st.select_slider("Timeline (Days)", options=[0, 30, 90, 180, 365, 730, 1460], value=180)
+    t_days = st.select_slider("Timeline (Days)", options=[0, 30, 90, 180, 365, 550,  730, 915, 1100, 1275, 1460], value=180)
     st.divider()
     st.info("**Model Boundary:** Antarctica bedrock target, 72 km/s impact.")
 
