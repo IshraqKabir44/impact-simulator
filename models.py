@@ -32,27 +32,36 @@ def calculate_food_security(diameter, days_post_impact):
         "loss_pct": round((1 - (current_supply/S0)) * 100, 1)}
 
 ## MODEL FOR THE FLOODING
-def calculate_water_effects(energy_joules):
-    # Alex's constants
-    heat_conversion_rate = 0.95
-    energy_to_melt_1kg_ice = 436000 # Joules (436 kJ/kg)
-    ocean_surface_area = 3.61e14    # m^2
+def calculate_water_effects(diameter):
+    # 1. Ensure units are base SI (meters and kg)
+    v_ms = 72000     # 72 km/s -> 72,000 m/s
+    rho = 1700       # kg/m^3
     
-    # 1. Energy converted to heat
-    q_imp = energy_joules * heat_conversion_rate
+    # 2. Energy Calculation
+    radius = diameter / 2
+    volume = (4/3) * math.pi * (radius**3)
+    mass_asteroid = volume * rho
+    energy_initial = 0.5 * mass_asteroid * (v_ms**2)
     
-    # 2. Mass of ice melted
-    m_ice_melted = q_imp / energy_to_melt_1kg_ice
+    # 3. Work lost to atmosphere (W) 
+    # Alex's W = 2.1027e19 Joules for a 1000m asteroid. 
+    # We scale this by the cross-sectional area (radius squared)
+    work_lost = 2.1027e19 * (radius / 500)**2
+    energy_final = energy_initial - work_lost
     
-    # 3. Volume of water (1kg ice = 1L water = 0.001 m^3)
+    # 4. Melt Logic (95% of energy)
+    q_imp = 0.95 * energy_final
+    energy_to_melt_ice = 436000 # Joules per kg
+    m_ice_melted = q_imp / energy_to_melt_ice
+    
+    # 5. Sea Level Rise
+    # 1 kg ice = 0.001 m^3 water
     v_water = m_ice_melted * 0.001
-    
-    # 4. Sea level rise (meters)
-    delta_h_meters = v_water / ocean_surface_area
-    delta_h_mm = delta_h_meters * 1000
+    ocean_area = 3.61e14 
+    delta_h_mm = (v_water / ocean_area) * 1000
     
     return {
         "ice_melted_kg": m_ice_melted,
-        "sea_level_mm": round(delta_h_mm, 2),  # <--- Check this spelling!
-        "years_equiv": round(delta_h_mm / 4.4, 1)}
-
+        "sea_level_mm": round(delta_h_mm, 2),
+        "years_equiv": round(delta_h_mm / 4.4, 1)
+    }
