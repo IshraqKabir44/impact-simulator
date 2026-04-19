@@ -32,7 +32,7 @@ with tab1:
 
 with tab2:
     # --- Alex's Model Display ---
-     if dia > 1800:
+    if dia > 1800:
         st.warning("☄️ GLOBAL EXTINCTION LEVEL EVENT: The energy release exceeds the bounds of this regional model.")
          
     st.subheader("South Pole Ice Melt & Sea Level Rise")
