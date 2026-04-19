@@ -72,41 +72,36 @@ def calculate_water_effects(diameter):
 
 ## VISUALIZATION OF DATA
 def generate_visual_maps(diameter):
-    # We create a dataframe with the diameter as the size
-    # No math here—we'll do the scaling in the 'traces'
-    data = pd.DataFrame({
-        "lat": [-90.0],
-        "lon": [0.0],
-        "magnitude": [diameter] 
-    })
-    
-    fig = px.scatter_geo(
-        data,
-        lat="lat",
-        lon="lon",
-        size="magnitude",
-        projection="orthographic",
-        size_max=100  # Allows the dot to grow very large
-    )
-    
+    dot_size = (diameter / 50) 
+
+    fig = go.Figure(go.Scattergeo(
+        lat=[-90],
+        lon=[0],
+        mode='markers',
+        marker=dict(
+            size=dot_size, # This is the raw pixel size
+            color='rgba(255, 0, 0, 0.6)',
+            line=dict(width=2, color='white'),
+            # This setting prevents Plotly from "normalizing" the size
+            sizemode='diameter' 
+        ),
+        name="Impact Zone"
+    ))
+
     fig.update_geos(
+        projection_type="orthographic",
         projection_rotation=dict(lat=-90, lon=0, roll=0),
         showland=True, landcolor="#444",
-        showocean=True, oceancolor="#0e1117"
+        showocean=True, oceancolor="#0e1117",
+        # This keeps the "Earth" at a fixed zoom so you see the dot grow
+        projection_scale=0.8 
     )
-    
-    fig.update_traces(
-        marker=dict(
-            color="red",
-            opacity=0.6,
-            sizemode='area',
-            # This is the "Magic Lever": 
-            # If the dot is too small, decrease this number.
-            # If the dot is too big, increase it.
-            sizeref=2.0 * max(data['magnitude']) / (100**2), 
-            line=dict(width=1, color="white")
-        )
+
+    fig.update_layout(
+        height=600,
+        margin={"r":0,"t":0,"l":0,"b":0},
+        paper_bgcolor="rgba(0,0,0,0)",
+        showlegend=False
     )
-    
-    fig.update_layout(height=600, margin={"r":0,"t":0,"l":0,"b":0}, paper_bgcolor="rgba(0,0,0,0)")
+
     return fig
