@@ -1,5 +1,6 @@
 import numpy as np
 
+## MODEL FOR THE FOOD CRISIS
 def calculate_food_security(diameter, days_post_impact):
     # --- 1. Constants from Tanner's Model ---
     S0 = 0.485  # Total Southern Ocean Fishery Yield (Million Tons)
@@ -29,3 +30,29 @@ def calculate_food_security(diameter, days_post_impact):
         "supply": round(current_supply, 3),
         "beta": round(beta_t * 100, 1),
         "loss_pct": round((1 - (current_supply/S0)) * 100, 1)}
+
+## MODEL FOR THE FLOODING
+def calculate_water_effects(energy_joules):
+    # Alex's constants
+    heat_conversion_rate = 0.95
+    energy_to_melt_1kg_ice = 436000 # Joules (436 kJ/kg)
+    ocean_surface_area = 3.61e14    # m^2
+    
+    # 1. Energy converted to heat
+    q_imp = energy_joules * heat_conversion_rate
+    
+    # 2. Mass of ice melted
+    m_ice_melted = q_imp / energy_to_melt_1kg_ice
+    
+    # 3. Volume of water (1kg ice = 1L water = 0.001 m^3)
+    v_water = m_ice_melted * 0.001
+    
+    # 4. Sea level rise (meters)
+    delta_h_meters = v_water / ocean_surface_area
+    delta_h_mm = delta_h_meters * 1000
+    
+    return {
+        "ice_melted_gt": round(m_ice_melted / 1e12, 2), # Gigatonnes
+        "sea_level_rise_mm": round(delta_h_mm, 2),
+        "years_equiv": round(delta_h_mm / 4.4, 1) # Relative to annual 4.4mm avg
+    }
