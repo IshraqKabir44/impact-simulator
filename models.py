@@ -2,6 +2,7 @@ import numpy as np
 import math
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 ## MODEL FOR THE FOOD CRISIS
 def calculate_food_security(diameter, days_post_impact):
@@ -70,47 +71,55 @@ def calculate_water_effects(diameter):
     }
 
 ## VISUALIZATION OF DATA
-import pandas as pd
-import plotly.express as px
 
 def generate_visual_maps(diameter):
-    # 1. Energy-based scaling (Diameter cubed represents Volume/Energy)
-    # We use a base size and then scale up.
-    impact_magnitude = (diameter / 500) ** 3
-    
-    data = pd.DataFrame({
-        "lat": [-90.0],
-        "lon": [0.0],
-        "size": [impact_magnitude]
-    })
-    
-    fig = px.scatter_geo(
-        data,
-        lat="lat",
-        lon="lon",
-        size="size",
-        projection="orthographic",
-        # size_max is the key—it sets how many pixels the largest dot can be
-        size_max=100, 
-        title="NASA Impact Assessment: Primary Strike Zone"
-    )
-    
-    # 2. Add the 'Shockwave' effect (Glow and Transparency)
-    fig.update_traces(
-        marker=dict(
-            color="Red",
-            opacity=0.6, # Makes it look like a thermal pulse, not a solid ball
-            line=dict(width=2, color="DarkRed") # The "Crater" rim
-        )
+    # 1. Calculate the real-world radius in degrees
+    # A 1000m asteroid creates a massive thermal zone. 
+    # We'll scale the 'radius' of the circle based on diameter.
+    # 0.5 to 5.0 degrees covers a huge chunk of the Pole.
+    radius_deg = (diameter / 1000) * 2.5 
+
+    fig = go.Figure()
+
+    # 2. Add the "Red Zone" as a background layer instead of a marker
+    fig.add_trace(go.Scattermapbox(
+        lat=[-90],
+        lon=[0],
+        mode='markers',
+        marker=go.scattermapbox.Marker(
+            size=0, # We hide the actual point
+            opacity=0
+        ),
+        showlegend=False
+    ))
+
+    # 3. Create a circular "Fill" tied to the map coordinates
+    fig.update_layout(
+        mapbox=dict(
+            style="carto-darkmatter",
+            center=dict(lat=-90, lon=0),
+            zoom=2.5,
+            # This 'layers' part is the secret sauce
+            layers=[{
+                "source": {
+                    "type": "FeatureCollection",
+                    "features": [{
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [0, -90]
+                        }
+                    }]
+                },
+                "type": "circle",
+                "color": "rgba(255, 0, 0, 0.5)", # Translucent Red
+                # This makes the radius dynamic based on our math!
+                "circle_radius": radius_deg * 20, 
+                "below": "traces"
+            }]
+        ),
+        margin={"r":0,"t":0,"l":0,"b":0},
+        height=600
     )
 
-    fig.update_geos(
-        projection_rotation=dict(lat=-90, lon=0, roll=0),
-        showland=True, landcolor="#d1d1d1",
-        showocean=True, oceancolor="#0e1117",
-        lataxis_showgrid=False, lonaxis_showgrid=False
-    )
-    
-    fig.update_layout(height=600, margin={"r":0,"t":40,"l":0,"b":0}, paper_bgcolor="rgba(0,0,0,0)")
-    
     return fig
