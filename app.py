@@ -25,7 +25,8 @@ with tab1:
 
     st.subheader("Trophic Cascade Impact")
     st.write(f"**Krill Population Status at T+{t_days} days:**")
-    st.progress(results_food['beta'] / 100)
+    safe_beta = max(0.0, results_food['beta'])
+    st.progress(safe_beta / 100)
 
     if results_food['loss_pct'] > 20:
         st.error("⚠️ CRITICAL FOOD SHORTAGE DETECTED IN SOUTHERN HEMISPHERE")
@@ -37,11 +38,14 @@ with tab2:
          
     st.subheader("South Pole Ice Melt & Sea Level Rise")
     
-    c1, c2 = st.columns(2)
-    c1.metric("Global Sea Level Rise", f"{results_water['sea_level_mm']} mm")
-    c2.metric("Climate Acceleration", f"{results_water['years_equiv']} Years", delta="of normal rise")
-    
-    st.info(f"Total Ice Melted: {results_water['ice_melted_kg']:.2e} kg")
+    if results_water['ice_melted_kg'] > 0:
+        c1, c2 = st.columns(2)
+        c1.metric("Global Sea Level Rise", f"{results_water['sea_level_mm']} mm")
+        c2.metric("Climate Acceleration", f"{results_water['years_equiv']} Years", delta="of normal rise")
+        st.info(f"Total Ice Melted: {results_water['ice_melted_kg']:.2e} kg")
+    else:
+        # If mass is 0 or negative due to atmospheric drag calculation
+        st.error("Kinetic energy fully dissipated by atmospheric drag. No surface melting occurred.")
     
     st.markdown("---")
     st.write("**Impact Analysis:**")
