@@ -78,7 +78,7 @@ def generate_visual_maps(diameter):
     data = pd.DataFrame({
         "lat": [-90.0],
         "lon": [0.0],
-        "size": [max(10, diameter / 10)] # Ensure the dot is always visible
+        "size": [visual_size] # Ensure the dot scales with asteroid diameter
     })
     
     # 2. Use scatter_geo (built for global/polar projections)
