@@ -7,7 +7,7 @@ st.title("NASA Asteroid Impact: Global Food Security")
 
 # --- Sidebar ---
 dia = st.sidebar.slider("Asteroid Diameter (m)", 500, 5000, 1000)
-t_days = st.sidebar.select_slider("Timeline", options=[0, 30, 90, 180, 365, 730, 1460], value=180)
+t_days = st.sidebar.select_slider("Timeline", options=[0, 30, 90, 180, 365, 545, 730, 915, 1095, 1280, 1460], value=180)
 
 # --- Execute Models ---
 results_food = models.calculate_food_security(dia, t_days)
