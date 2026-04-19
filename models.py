@@ -71,50 +71,42 @@ def calculate_water_effects(diameter):
     }
 
 ## VISUALIZATION OF DATA
-
 def generate_visual_maps(diameter):
-    impact_size = (diameter / 100) ** 2.5 
-    
+    # We create a dataframe with the diameter as the size
+    # No math here—we'll do the scaling in the 'traces'
     data = pd.DataFrame({
         "lat": [-90.0],
         "lon": [0.0],
-        "size": [impact_size],
-        "label": ["Primary Impact Zone"]
+        "magnitude": [diameter] 
     })
     
-    # 2. Re-enabling the 3D Globe
     fig = px.scatter_geo(
         data,
         lat="lat",
         lon="lon",
-        size="size",
+        size="magnitude",
         projection="orthographic",
-        size_max=80, # This is the cap. 80 is huge on a globe.
-        hover_name="label"
+        size_max=100  # Allows the dot to grow very large
     )
     
-    # 3. Formatting the globe and centering the South Pole
     fig.update_geos(
         projection_rotation=dict(lat=-90, lon=0, roll=0),
         showland=True, landcolor="#444",
-        showocean=True, oceancolor="#0e1117",
-        showcountries=True, countrycolor="#666"
+        showocean=True, oceancolor="#0e1117"
     )
     
-    # 4. Forcing the Red Zone to be a glowing "Heat" area
     fig.update_traces(
         marker=dict(
             color="red",
             opacity=0.6,
-            line=dict(width=2, color="white") # White rim makes it pop on dark ice
+            sizemode='area',
+            # This is the "Magic Lever": 
+            # If the dot is too small, decrease this number.
+            # If the dot is too big, increase it.
+            sizeref=2.0 * max(data['magnitude']) / (100**2), 
+            line=dict(width=1, color="white")
         )
     )
     
-    fig.update_layout(
-        height=600, 
-        margin={"r":0,"t":40,"l":0,"b":0}, 
-        paper_bgcolor="rgba(0,0,0,0)",
-        showlegend=False
-    )
-    
+    fig.update_layout(height=600, margin={"r":0,"t":0,"l":0,"b":0}, paper_bgcolor="rgba(0,0,0,0)")
     return fig
