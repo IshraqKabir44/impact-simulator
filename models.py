@@ -74,45 +74,35 @@ import pandas as pd
 import plotly.express as px
 
 def generate_visual_maps(diameter):
-    """Generates an interactive polar map showing the blast radius and ice melt area."""
-    # 1. Calculate Blast Radius (Scaling based on Collins et al. 2005)
-    # The 'vaporization zone' scales with Energy^(1/3).
-    # For a 1km rock at 72km/s, this is ~30-50km from the epicenter.
-    vaporization_radius_km = (0.002 * (diameter ** 1.3)) / 2 
-    
-    # 2. Plotly requires a 'DataFrame' (a spreadsheet) to map.
-    # We define the center (South Pole) and the intensity.
+    # 1. Create the data point at the South Pole
     data = pd.DataFrame({
-        "Lat": [-90],
-        "Lon": [0],
-        "Type": ["Primary Strike Zone"],
-        # We scale the intensity of the point by the diameter
-        "Blast Intensity (MT)": [(diameter/1000) * 550000] 
+        "lat": [-90.0],
+        "lon": [0.0],
+        "size": [max(10, diameter / 10)] # Ensure the dot is always visible
     })
     
-    # 3. Create the Polar Map
-    fig = px.scatter_mapbox(data,
-                            lat="Lat",
-                            lon="Lon",
-                            color="Type",
-                            color_discrete_sequence=["#FF3300"], # Intense Red
-                            # The circle size dynamicly scales with the blast zone
-                            size=[vaporization_radius_km], 
-                            size_max=300, # Max zoom level limit
-                            zoom=2,
-                            height=600,
-                            title=f"Initial Thermal Blast Zone ({vaporization_radius_km:.1f} km Radius)")
-    
-    # 4. Map Style Settings
-    fig.update_layout(
-        mapbox_style="carto-darkmatter", 
-        mapbox=dict(
-            center=dict(lat=-90, lon=0), # Hard-locks the center to the Pole
-            zoom=1.5 # Pulls back so you can see the whole continent
-        ),
-        margin={"r":0,"t":40,"l":0,"b":0},
-        showlegend=False # Cleans up that white space on the right
+    # 2. Use scatter_geo (built for global/polar projections)
+    fig = px.scatter_geo(
+        data,
+        lat="lat",
+        lon="lon",
+        size="size",
+        projection="orthographic", # Gives it that 3D Globe look
+        title=f"Impact Epicenter: South Pole"
     )
     
-    # This makes the dot actually show up as a circle rather than a tiny point
-    fig.update_traces(marker=dict(opacity=0.7, sizemode='area'))
+    # 3. Focus the globe on the South Pole
+    fig.update_geos(
+        projection_rotation=dict(lat=-90, lon=0, roll=0),
+        showland=True, landcolor="white",
+        showocean=True, oceancolor="MidnightBlue",
+        showlakes=False,
+        showcountries=True
+    )
+    
+    # 4. Make the impact zone red and glowing
+    fig.update_traces(marker=dict(color="Red", opacity=0.8, line=dict(width=2, color="DarkRed")))
+    
+    fig.update_layout(height=500, margin={"r":0,"t":40,"l":0,"b":0}, paper_bgcolor="rgba(0,0,0,0)")
+    
+    return fig
