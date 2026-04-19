@@ -104,8 +104,15 @@ def generate_visual_maps(diameter):
                             title=f"Initial Thermal Blast Zone ({vaporization_radius_km:.1f} km Radius)")
     
     # 4. Map Style Settings
-    fig.update_layout(mapbox_style="carto-darkmatter", # Dark NASA style map
-                      mapbox_center={"lat": -90, "lon": 0},
-                      margin={"r":0,"t":40,"l":0,"b":0})
+    fig.update_layout(
+        mapbox_style="carto-darkmatter", 
+        mapbox=dict(
+            center=dict(lat=-90, lon=0), # Hard-locks the center to the Pole
+            zoom=1.5 # Pulls back so you can see the whole continent
+        ),
+        margin={"r":0,"t":40,"l":0,"b":0},
+        showlegend=False # Cleans up that white space on the right
+    )
     
-    return fig
+    # This makes the dot actually show up as a circle rather than a tiny point
+    fig.update_traces(marker=dict(opacity=0.7, sizemode='area'))
