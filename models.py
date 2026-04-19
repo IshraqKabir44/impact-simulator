@@ -52,6 +52,10 @@ def calculate_water_effects(energy_joules):
     delta_h_mm = delta_h_meters * 1000
     
     return {
+        "ice_melted_kg": m_ice_melted,
+    "sea_level_mm": round(delta_h_mm, 2),  # <--- Check this spelling!
+    "years_equiv": round(delta_h_mm / 4.4, 1)
+}
         "ice_melted_gt": round(m_ice_melted / 1e12, 2), # Gigatonnes
         "sea_level_rise_mm": round(delta_h_mm, 2),
         "years_equiv": round(delta_h_mm / 4.4, 1) # Relative to annual 4.4mm avg
