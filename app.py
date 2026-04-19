@@ -1,53 +1,91 @@
 import streamlit as st
 import models
-import pandas as pd
+import plotly.graph_objects as go
 
-st.set_page_config(layout="wide")
-st.title("NASA Asteroid Impact: Global Food Security")
+st.set_page_config(page_title="Project A.S.P.I.", layout="wide")
+
+# --- CUSTOM CSS FOR NASA THEME ---
+st.markdown("""
+    <style>
+    .stApp { background-color: #0c0f14; color: #e0e6ed; }
+    .stTabs [data-baseweb="tab-list"] { gap: 10px; }
+    .stTabs [data-baseweb="tab"] { background-color: #1a1e26; border-radius: 5px; color: #a1a9b8; }
+    .stTabs [aria-selected="true"] { background-color: #313a4d; color: #ffffff; }
+    .stMetric { border: 1px solid #333; padding: 15px; border-radius: 10px; background-color: #1a1e26; }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("🛰️ Project A.S.P.I. (Antarctic South Pole Impact)")
+st.caption("National Aeronautics and Space Administration (NASA) - Consequence Assessment Dashboard")
 
 # --- Sidebar ---
-dia = st.sidebar.slider("Asteroid Diameter (m)", 500, 5000, 1000)
-t_days = st.sidebar.select_slider("Timeline", options=[0, 30, 90, 180, 365, 545, 730, 915, 1095, 1280, 1460], value=180)
+with st.sidebar:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg", width=120)
+    st.header("Simulation Settings")
+    st.markdown("Adjust the initial impactor variables:")
+    dia = st.slider("Asteroid Diameter (m)", 500, 5000, 1000)
+    t_days = st.select_slider("Timeline (Days)", options=[0, 30, 90, 180, 365, 730, 1460], value=180)
+    st.divider()
+    st.info("**Model Boundary:** Antarctica bedrock target, 72 km/s impact.")
 
 # --- Execute Models ---
-results_food = models.calculate_food_security(dia, t_days)
-results_water = models.calculate_water_effects(dia)
+# Tanner
+res_food = models.calculate_food_security(dia, t_days)
+# Alex
+res_water = models.calculate_water_effects(dia)
+# Maps (Using Alex's data for scaling)
+map_viz = models.generate_visual_maps(dia)
 
 # --- Create Tabs ---
-tab1, tab2 = st.tabs(["🦐 Food Security", "🌊 Water Effects"])
+tab1, tab2 = st.tabs(["🌾 Tanner: Trophic Collapse", "💧 Alex: Cryosphere Melt"])
 
 with tab1:
-    # --- Tanner's Model Display (Your Original Code) ---
+    # 1. Data Metrics
     col1, col2, col3 = st.columns(3)
-    col1.metric("Sunlight Levels", f"{results_food['beta']}%", delta="-28% vs Pre-Impact")
-    col2.metric("Fishery Yield", f"{results_food['supply']}M Tons")
-    col3.metric("Global Food Deficit", f"{results_food['loss_pct']}%", delta_color="inverse")
+    col1.metric("Atmospheric Sunlight", f"{res_food['beta']}%", delta="-28% cap")
+    col2.metric("Fishery Yield (Area 48/58)", f"{res_food['supply']}M Tons")
+    col3.metric("Global Food Deficit", f"{res_food['loss_pct']}%", delta_color="inverse")
 
-    st.subheader("Trophic Cascade Impact")
-    st.write(f"**Krill Population Status at T+{t_days} days:**")
-    safe_beta = max(0.0, results_food['beta'])
-    st.progress(safe_beta / 100)
+    # 2. Visual Sunlight Intensity (The "Regular Day" idea)
+    st.markdown("---")
+    st.subheader("Visual Sunlight Intensity")
+    st.caption(f"Comparing a baseline clear day at the South Pole vs. T+{t_days} days post-impact.")
+    
+    sun_intensity = res_food['beta'] / 100 # Convert to 0.0-1.0
+    
+    # We can use CSS to dynamically color a box based on the intensity
+    # 0% = black, 100% = bright yellow
+    hex_intensity = int(sun_intensity * 255)
+    sun_color = f"#{hex_intensity:02x}{hex_intensity:02x}{0:02x}" # Shades of Yellow/Black
 
-    if results_food['loss_pct'] > 20:
-        st.error("⚠️ CRITICAL FOOD SHORTAGE DETECTED IN SOUTHERN HEMISPHERE")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.markdown(f'<div style="width:100%;height:150px;background-color:#FFFFCC;border-radius:10px;border:3px solid #FFD700;display:flex;justify-content:center;align-items:center;color:#000;"><strong>PRE-IMPACT: 100%</strong></div>', unsafe_allow_html=True)
+    with col_b:
+        st.markdown(f'<div style="width:100%;height:150px;background-color:{sun_color};border-radius:10px;border:3px solid #a1a9b8;display:flex;justify-content:center;align-items:center;color:#fff;"><strong>CURRENT (T+{t_days}): {res_food["beta"]}%</strong></div>', unsafe_allow_html=True)
+
+    # 3. Critical Status
+    if res_food['loss_pct'] > 15:
+        st.error(f"⚠️ SEVERE FOOD SHORTAGE ALERT: Global deficit exceeds 15% due to krill biomass suppression.")
 
 with tab2:
-    # --- Alex's Model Display ---
-    if dia > 1800:
-        st.warning("☄️ GLOBAL EXTINCTION LEVEL EVENT: The energy release exceeds the bounds of this regional model.")
-         
-    st.subheader("South Pole Ice Melt & Sea Level Rise")
-    
-    if results_water['ice_melted_kg'] > 0:
-        c1, c2 = st.columns(2)
-        c1.metric("Global Sea Level Rise", f"{results_water['sea_level_mm']} mm")
-        c2.metric("Climate Acceleration", f"{results_water['years_equiv']} Years", delta="of normal rise")
-        st.info(f"Total Ice Melted: {results_water['ice_melted_kg']:.2e} kg")
-    else:
-        # If mass is 0 or negative due to atmospheric drag calculation
-        st.error("Kinetic energy fully dissipated by atmospheric drag. No surface melting occurred.")
-    
+    # 1. Data Metrics
+    c1, c2 = st.columns(2)
+    c1.metric("Instant Sea Level Rise", f"{res_water['sea_level_mm']} mm", delta=f"{res_water['years_equiv']} years eq.")
+    c2.metric("Melt Volume (Cryosphere)", f"{res_water['ice_melted_kg']:.2e} kg")
+
+    # 2. Dynamic Red Zone Map
     st.markdown("---")
-    st.write("**Impact Analysis:**")
-    st.write(f"Because the impact occurs at the **South Pole landmass**, there is no direct displacement tsunami. However, the thermal pulse creates an instantaneous melt equivalent to {results_water['years_equiv']} years of current global warming.")
-   
+    st.subheader("3D Polar Visualization")
+    st.caption("The red circle indicates the immediate 'Zone of Vaporization' where Antarctic ice is converted directly into liquid water and steam upon impact. Move the Diameter slider to see the zone scale.")
+    
+    if dia > 1800:
+        st.warning("☄️ EXTINCTION LIMIT: Energy exceeds regional scaling model, displaying max blast zone.")
+
+    # Show the Map!
+    st.plotly_chart(map_viz, use_container_width=True)
+    
+    # 3. Impact Summary
+    st.divider()
+    st.write("**Assessment:**")
+    st.write(f"Thermal pulse converts ~95% of final kinetic energy into latent heat, driving a global sea level rise of {res_water['sea_level_mm']}mm. Impact on South Pole landmass prevents direct displacement tsunamis; however, a Richter Magnitude ~9.0 seismic quake is projected.")
