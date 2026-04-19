@@ -11,7 +11,13 @@ st.markdown("""
     .stTabs [data-baseweb="tab-list"] { gap: 10px; }
     .stTabs [data-baseweb="tab"] { background-color: #1a1e26; border-radius: 5px; color: #a1a9b8; }
     .stTabs [aria-selected="true"] { background-color: #313a4d; color: #ffffff; }
-    .stMetric { border: 1px solid #333; padding: 15px; border-radius: 10px; background-color: #1a1e26; }
+    .stMetric { border: 1px solid #333; padding: 15px; border-radius: 10px; background-color: #1a1e26; color: #ffffff !important; }
+    [data-testid="stMetricLabel"] {
+        color: #a1a9b8 !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: #ffffff !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
