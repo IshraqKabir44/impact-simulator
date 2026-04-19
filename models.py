@@ -1,5 +1,7 @@
 import numpy as np
 import math
+import pandas as pd
+import plotly.express as px
 
 ## MODEL FOR THE FOOD CRISIS
 def calculate_food_security(diameter, days_post_impact):
@@ -66,3 +68,44 @@ def calculate_water_effects(diameter):
         "sea_level_mm": round(delta_h_mm, 2),
         "years_equiv": round(delta_h_mm / 4.4, 1)
     }
+
+## VISUALIZATION OF DATA
+import pandas as pd
+import plotly.express as px
+
+def generate_visual_maps(diameter):
+    """Generates an interactive polar map showing the blast radius and ice melt area."""
+    # 1. Calculate Blast Radius (Scaling based on Collins et al. 2005)
+    # The 'vaporization zone' scales with Energy^(1/3).
+    # For a 1km rock at 72km/s, this is ~30-50km from the epicenter.
+    vaporization_radius_km = (0.002 * (diameter ** 1.3)) / 2 
+    
+    # 2. Plotly requires a 'DataFrame' (a spreadsheet) to map.
+    # We define the center (South Pole) and the intensity.
+    data = pd.DataFrame({
+        "Lat": [-90],
+        "Lon": [0],
+        "Type": ["Primary Strike Zone"],
+        # We scale the intensity of the point by the diameter
+        "Blast Intensity (MT)": [(diameter/1000) * 550000] 
+    })
+    
+    # 3. Create the Polar Map
+    fig = px.scatter_mapbox(data,
+                            lat="Lat",
+                            lon="Lon",
+                            color="Type",
+                            color_discrete_sequence=["#FF3300"], # Intense Red
+                            # The circle size dynamicly scales with the blast zone
+                            size=[vaporization_radius_km], 
+                            size_max=300, # Max zoom level limit
+                            zoom=2,
+                            height=600,
+                            title=f"Initial Thermal Blast Zone ({vaporization_radius_km:.1f} km Radius)")
+    
+    # 4. Map Style Settings
+    fig.update_layout(mapbox_style="carto-darkmatter", # Dark NASA style map
+                      mapbox_center={"lat": -90, "lon": 0},
+                      margin={"r":0,"t":40,"l":0,"b":0})
+    
+    return fig
