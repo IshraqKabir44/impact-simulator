@@ -32,6 +32,9 @@ with tab1:
 
 with tab2:
     # --- Alex's Model Display ---
+     if dia > 1800:
+        st.warning("☄️ GLOBAL EXTINCTION LEVEL EVENT: The energy release exceeds the bounds of this regional model.")
+         
     st.subheader("South Pole Ice Melt & Sea Level Rise")
     
     c1, c2 = st.columns(2)
@@ -43,5 +46,4 @@ with tab2:
     st.markdown("---")
     st.write("**Impact Analysis:**")
     st.write(f"Because the impact occurs at the **South Pole landmass**, there is no direct displacement tsunami. However, the thermal pulse creates an instantaneous melt equivalent to {results_water['years_equiv']} years of current global warming.")
-    if dia > 1800:
-        st.warning("☄️ GLOBAL EXTINCTION LEVEL EVENT: The energy release exceeds the bounds of this regional model.")
+   
