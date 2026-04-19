@@ -60,7 +60,7 @@ with tab1:
 
     col_a, col_b = st.columns(2)
     with col_a:
-        st.markdown(f'<div style="width:100%;height:150px;background-color:#FFFFCC;border-radius:10px;border:3px solid #FFD700;display:flex;justify-content:center;align-items:center;color:#000;"><strong>PRE-IMPACT: 100%</strong></div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="width:100%;height:150px;background-color:#ffff00;border-radius:10px;border:3px solid #FFD700;display:flex;justify-content:center;align-items:center;color:#000;"><strong>PRE-IMPACT: 100%</strong></div>', unsafe_allow_html=True)
     with col_b:
         st.markdown(f'<div style="width:100%;height:150px;background-color:{sun_color};border-radius:10px;border:3px solid #a1a9b8;display:flex;justify-content:center;align-items:center;color:#fff;"><strong>CURRENT (T+{t_days}): {res_food["beta"]}%</strong></div>', unsafe_allow_html=True)
 
