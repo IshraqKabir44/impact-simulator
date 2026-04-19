@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 ## MODEL FOR THE FOOD CRISIS
 def calculate_food_security(diameter, days_post_impact):
