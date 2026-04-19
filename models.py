@@ -75,7 +75,6 @@ import plotly.express as px
 
 def generate_visual_maps(diameter):
     # 1. Create the data point at the South Pole
-    def generate_visual_maps(diameter):
     # We use a power of 2 to represent Area (pi * r^2)
     scaling_factor = (diameter / 500) ** 2 
     
