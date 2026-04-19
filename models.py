@@ -75,20 +75,25 @@ import plotly.express as px
 
 def generate_visual_maps(diameter):
     # 1. Create the data point at the South Pole
+    def generate_visual_maps(diameter):
+    # We use a power of 2 to represent Area (pi * r^2)
+    scaling_factor = (diameter / 500) ** 2 
+    
+    # 2. Now put it into the DataFrame
     data = pd.DataFrame({
         "lat": [-90.0],
         "lon": [0.0],
-        "size": [visual_size] # Ensure the dot scales with asteroid diameter
+        "size": [scaling_factor] 
     })
     
-    # 2. Use scatter_geo (built for global/polar projections)
+    # 3. Use scatter_geo
     fig = px.scatter_geo(
         data,
         lat="lat",
         lon="lon",
         size="size",
-        projection="orthographic", # Gives it that 3D Globe look
-        title=f"Impact Epicenter: South Pole"
+        projection="orthographic",
+        title="Impact Epicenter: South Pole"
     )
     
     # 3. Focus the globe on the South Pole
