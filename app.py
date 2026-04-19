@@ -84,7 +84,12 @@ with tab1:
 with tab2:
     # 1. Data Metrics
     c1, c2 = st.columns(2)
-    c1.metric("Instant Sea Level Rise", f"{res_water['sea_level_mm']} mm", delta=f"{res_water['years_equiv']} years eq., delta_color="inverse")
+    c1.metric(
+        label="Instant Sea Level Rise", 
+        value=f"{res_water['sea_level_mm']} mm", 
+        delta=f"{res_water['years_equiv']} years eq.", 
+        delta_color="inverse"
+    )
     c2.metric("Melt Volume (Cryosphere)", f"{res_water['ice_melted_kg']:.2e} kg")
 
     # 2. Dynamic Red Zone Map
