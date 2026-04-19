@@ -49,11 +49,11 @@ with tab1:
     # 1. Data Metrics
     col1, col2, col3 = st.columns(3)
     # Calculate the actual drop
-    sun_drop = results_food['beta'] - 100
+    sun_drop = res_food['beta'] - 100
 
     col1.metric(
         "Sunlight Levels", 
-        f"{results_food['beta']}%", 
+        f"{res_food['beta']}%", 
         delta=f"{sun_drop:.1f}% vs Pre-Impact"
     )
     col2.metric("Fishery Yield (Area 48/58)", f"{res_food['supply']}M Tons")
