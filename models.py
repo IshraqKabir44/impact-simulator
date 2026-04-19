@@ -74,39 +74,43 @@ import pandas as pd
 import plotly.express as px
 
 def generate_visual_maps(diameter):
-    # 1. Create the data point at the South Pole
-    # We use a power of 2 to represent Area (pi * r^2)
-    scaling_factor = (diameter / 500) ** 2 
+    # 1. Energy-based scaling (Diameter cubed represents Volume/Energy)
+    # We use a base size and then scale up.
+    impact_magnitude = (diameter / 500) ** 3
     
-    # 2. Now put it into the DataFrame
     data = pd.DataFrame({
         "lat": [-90.0],
         "lon": [0.0],
-        "size": [scaling_factor] 
+        "size": [impact_magnitude]
     })
     
-    # 3. Use scatter_geo
     fig = px.scatter_geo(
         data,
         lat="lat",
         lon="lon",
         size="size",
         projection="orthographic",
-        title="Impact Epicenter: South Pole"
+        # size_max is the key—it sets how many pixels the largest dot can be
+        size_max=100, 
+        title="NASA Impact Assessment: Primary Strike Zone"
     )
     
-    # 3. Focus the globe on the South Pole
+    # 2. Add the 'Shockwave' effect (Glow and Transparency)
+    fig.update_traces(
+        marker=dict(
+            color="Red",
+            opacity=0.6, # Makes it look like a thermal pulse, not a solid ball
+            line=dict(width=2, color="DarkRed") # The "Crater" rim
+        )
+    )
+
     fig.update_geos(
         projection_rotation=dict(lat=-90, lon=0, roll=0),
-        showland=True, landcolor="white",
-        showocean=True, oceancolor="MidnightBlue",
-        showlakes=False,
-        showcountries=True
+        showland=True, landcolor="#d1d1d1",
+        showocean=True, oceancolor="#0e1117",
+        lataxis_showgrid=False, lonaxis_showgrid=False
     )
     
-    # 4. Make the impact zone red and glowing
-    fig.update_traces(marker=dict(color="Red", opacity=0.8, line=dict(width=2, color="DarkRed")))
-    
-    fig.update_layout(height=500, margin={"r":0,"t":40,"l":0,"b":0}, paper_bgcolor="rgba(0,0,0,0)")
+    fig.update_layout(height=600, margin={"r":0,"t":40,"l":0,"b":0}, paper_bgcolor="rgba(0,0,0,0)")
     
     return fig
