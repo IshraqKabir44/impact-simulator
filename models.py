@@ -73,53 +73,48 @@ def calculate_water_effects(diameter):
 ## VISUALIZATION OF DATA
 
 def generate_visual_maps(diameter):
-    # 1. Calculate the real-world radius in degrees
-    # A 1000m asteroid creates a massive thermal zone. 
-    # We'll scale the 'radius' of the circle based on diameter.
-    # 0.5 to 5.0 degrees covers a huge chunk of the Pole.
-    radius_deg = (diameter / 1000) * 2.5 
-
-    fig = go.Figure()
-
-    # 2. Add the "Red Zone" as a background layer instead of a marker
-    fig.add_trace(go.Scattermapbox(
-        lat=[-90],
-        lon=[0],
-        mode='markers',
-        marker=go.scattermapbox.Marker(
-            size=0, # We hide the actual point
-            opacity=0
-        ),
-        showlegend=False
-    ))
-
-    # 3. Create a circular "Fill" tied to the map coordinates
-    fig.update_layout(
-        mapbox=dict(
-            style="carto-darkmatter",
-            center=dict(lat=-90, lon=0),
-            zoom=2.5,
-            # This 'layers' part is the secret sauce
-            layers=[{
-                "source": {
-                    "type": "FeatureCollection",
-                    "features": [{
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "Point",
-                            "coordinates": [0, -90]
-                        }
-                    }]
-                },
-                "type": "circle",
-                "color": "rgba(255, 0, 0, 0.5)", # Translucent Red
-                # This makes the radius dynamic based on our math!
-                "circle_radius": radius_deg * 20, 
-                "below": "traces"
-            }]
-        ),
-        margin={"r":0,"t":0,"l":0,"b":0},
-        height=600
+    impact_size = (diameter / 100) ** 2.5 
+    
+    data = pd.DataFrame({
+        "lat": [-90.0],
+        "lon": [0.0],
+        "size": [impact_size],
+        "label": ["Primary Impact Zone"]
+    })
+    
+    # 2. Re-enabling the 3D Globe
+    fig = px.scatter_geo(
+        data,
+        lat="lat",
+        lon="lon",
+        size="size",
+        projection="orthographic",
+        size_max=80, # This is the cap. 80 is huge on a globe.
+        hover_name="label"
     )
-
+    
+    # 3. Formatting the globe and centering the South Pole
+    fig.update_geos(
+        projection_rotation=dict(lat=-90, lon=0, roll=0),
+        showland=True, landcolor="#444",
+        showocean=True, oceancolor="#0e1117",
+        showcountries=True, countrycolor="#666"
+    )
+    
+    # 4. Forcing the Red Zone to be a glowing "Heat" area
+    fig.update_traces(
+        marker=dict(
+            color="red",
+            opacity=0.6,
+            line=dict(width=2, color="white") # White rim makes it pop on dark ice
+        )
+    )
+    
+    fig.update_layout(
+        height=600, 
+        margin={"r":0,"t":40,"l":0,"b":0}, 
+        paper_bgcolor="rgba(0,0,0,0)",
+        showlegend=False
+    )
+    
     return fig
