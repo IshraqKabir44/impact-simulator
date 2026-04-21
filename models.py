@@ -12,7 +12,7 @@ def calculate_food_security(diameter, days_post_impact):
     recovery_time = 1460  # 48 months in days
     
     # --- 2. Dust/Sunlight Factor (Beta) ---
-    # Based on Bennu study: 500m = 28% drop. Scaling for diameter:
+    # Based on Tanner Model: 1000m = 28% drop. Scaling for diameter:
     max_sunlight_reduction = 0.28 * (diameter / 500)
     
     # Decay of dust over time (Simple linear recovery for Beta)
