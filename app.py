@@ -90,7 +90,7 @@ with tab2:
         delta=f"{res_water['years_equiv']} years eq.", 
         delta_color="inverse"
     )
-    c2.metric("Melt Volume (Cryosphere)", f"{res_water['ice_melted_kg']:.2e} kg")
+    c2.metric("Melt Mass (Cryosphere)", f"{res_water['ice_melted_kg']:.2e} kg")
 
     # 2. Dynamic Red Zone Map
     st.markdown("---")
