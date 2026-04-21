@@ -13,7 +13,7 @@ def calculate_food_security(diameter, days_post_impact):
     
     # --- 2. Dust/Sunlight Factor (Beta) ---
     # Based on Tanner Model: 1000m = 28% drop. Scaling for diameter:
-    max_sunlight_reduction = 0.28 * (diameter / 500)
+    max_sunlight_reduction = 0.28 * (diameter / 1000)
     
     # Decay of dust over time (Simple linear recovery for Beta)
     if days_post_impact < recovery_time:
