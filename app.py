@@ -57,7 +57,7 @@ with tab1:
         delta=f"{sun_drop:.1f}% vs Pre-Impact"
     )
     col2.metric("Fishery Yield (Area 48/58)", f"{res_food['supply']}M Tons")
-    col3.metric("Global Food Deficit", f"{res_food['loss_pct']}%", delta_color="inverse")
+    col3.metric("Antarctic Food Deficit", f"{res_food['loss_pct']}%", delta_color="inverse")
 
     # 2. Visual Sunlight Intensity (The "Regular Day" idea)
     st.markdown("---")
